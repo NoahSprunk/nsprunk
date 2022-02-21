@@ -1,0 +1,126 @@
+---
+title: "Assignment_2"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(ggplot2)
+library(lattice)
+library(caret)
+library(class)
+Bank <- read.csv("C:\\Users\\Noah\\Downloads\\UniversalBank.csv")
+
+Bank$ID <- NULL
+Bank$ZIP.Code <-NULL
+
+summary(Bank)
+
+Bank$Personal.Loan=as.factor(Bank$Personal.Loan)
+
+Norm_model <- preProcess(Bank[,-8], 
+                         method = c("center", "scale")) 
+Bank_norm=predict(Norm_model,Bank[,-8])
+
+summary(Bank_norm)
+
+Bank_norm$Personal.Loan=Bank$Personal.Loan
+
+Train_Index = createDataPartition(Bank$Personal.Loan, p = 0.6, list = FALSE)
+Train.df=Bank_norm[Train_Index,] 
+Validation.df=Bank_norm[-Train_Index,]
+
+summary(UniversalBank)
+
+
+To_Predict=data.frame(Age=40, Experience=10, Income=84, Family=2, CCAvg=2,
+                      Education=2, Mortgage=0, Securities.Account=0,
+                      CD.Account=0, Online=1, CreditCard=1)
+print(To_Predict)
+To_Predict_norm=predict(Norm_model,To_Predict) 
+print(To_Predict_norm)
+
+
+Prediction <-knn(train=Train.df[,1:8],  
+                 test=To_Predict_norm[,1:8], 
+                 cl=Train.df$Personal.Loan, 
+                 k=1) 
+print(Prediction)
+
+#The campaign was not successful, the customer did not
+#accept the personal loan
+
+# Task 2
+
+
+set.seed(123) 
+fitControl <- trainControl(method = "repeatedcv", 
+                           number = 3, 
+                           repeats = 2) 
+
+searchGrid=expand.grid(k = 1:10) 
+
+Knn.model=train(Personal.Loan~.,  
+                data=Train.df, 
+                method='knn', 
+                tuneGrid=searchGrid, 
+                trControl = fitControl,) 
+
+Knn.model 
+
+predictions<-predict(Knn.model,Validation.df) 
+
+#I found that K = 1 is the best k to use. 
+
+# Task 3
+
+confusionMatrix(predictions,Validation.df$Personal.Loan)
+
+
+
+# Task 4
+
+To_Predict=data.frame(Age=40, Experience=10, Income=84, Family=2, CCAvg=2,
+                      Education=2, Mortgage=0, Securities.Account=0,
+                      CD.Account=0, Online=1, CreditCard=1)
+print(To_Predict)
+To_Predict_norm=predict(Norm_model,To_Predict) 
+print(To_Predict_norm) 
+
+Prediction <-knn(train=Train.df[,1:8],  
+                 test=To_Predict_norm[,1:8], 
+                 cl=Train.df$Personal.Loan, 
+                 k=1) #Need to add the k value that I get above
+
+print(Prediction)
+
+#The campign was also not successful on the second customer.
+
+
+# Task 5
+
+
+Train_Index2 = createDataPartition(Bank$Personal.Loan, p = 0.5, list = FALSE) # 50% reserved for Train 
+Train2.df=Bank_norm[Train_Index,] 
+Validation2.df=Bank_norm[-Train_Index,]
+
+Train_Index2 = createDataPartition(Bank$Personal.Loan, p = 0.6, list = FALSE) # 60% reserved for Validation and 40% for Test 
+Validation2.df=Bank_norm[Train_Index,] 
+Test2.df=Bank_norm[-Train_Index,]
+
+# Need to apply the k-NN method from above with the chosen k, once it starts working
+
+confusionMatrix(predictions,Validation.df$Personal.Loan)
+
+#I notice that the 
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
