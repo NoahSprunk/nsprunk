@@ -1,0 +1,84 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(tidyverse)
+library(factoextra) 
+library(ISLR)
+library(ggplot2)
+library(lattice)
+library(caret)
+library(class)
+library(ISLR)
+library(e1071)
+library(gmodels)
+library(cluster)
+
+
+Cereal <- read.csv("C:\\Users\\Noah\\Downloads\\Cereals.csv")
+
+Cereal <- df[-c(8), ]
+Cereal <- df[-c(21), ]
+Cereal <- df[-c(58), ]
+
+Cereal
+
+Dist <- dist(Cereal, method = "euclidean")
+
+Dist.norm <- sapply(Dist, scale)
+Dist.norm <- dist(Cereal, method = "euclidean")
+summary(Dist)
+
+
+hc1 <- hclust(Dist.norm, method = "single")
+plot(hc1, hang = -1, ann = FALSE)
+
+hc2 <- hclust(Dist.norm, method = "average")
+plot(hc2, hang = -1, ann = FALSE)
+
+hc3 <- hclust(Dist.norm, method = "complete")
+plot(hc3, hang = -1, ann = FALSE)
+
+hc4 <- hclust(Dist.norm, method = "ward.D")
+plot(hc4, hang = -1, ann = FALSE)
+
+hc_single <- agnes(Dist.norm, method = "single")
+hc_complete <- agnes(Dist.norm, method = "complete")
+hc_average <- agnes(Dist.norm, method = "average")
+
+print(hc_single$ac)
+print(hc_complete$ac)
+print(hc_average$ac)
+
+pltree(hc_complete, cex = 0.6, hang = -1, main = "Dendrogram of agnes")
+hc_complete <- hclust(Dist.norm, method = "complete")
+plot(hc_complete, cex = 0.6)
+rect.hclust(hc_complete, k = 4, border = 1:4)
+
+#The best methd to choose was the complete linkage because it had the 
+#highesting structure for the data.
+
+#Given that we used the complete linkage, I think the best number of 
+#clusters to use is 4. When printing the dendrogram it shows 4
+#distinct clusters.
+
+#When choosing the best cluster for the school, I would go with cluster
+#4 because it has realitely high protien with low sugars and moderate
+#calories. It would be a better chose then having the cereals with the highest
+#amounts of sugar available for lunch. 
+
+
+
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
